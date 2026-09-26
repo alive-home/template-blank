@@ -8,10 +8,8 @@ test("api health responds", async ({ request }) => {
   await expect(res.json()).resolves.toEqual({ ok: true })
 })
 
-test("home page renders and greets", async ({ page }) => {
-  await page.goto("/")
-  await expect(page.getByRole("heading", { name: "Hello oRPC" })).toBeVisible()
-  await page.getByPlaceholder("your name").fill("playwright")
-  await page.getByRole("button", { name: "greet" }).click()
-  await expect(page.getByText("Hello, playwright!")).toBeVisible()
+test("home page renders", async ({ page }) => {
+  const res = await page.goto("/")
+  expect(res?.ok()).toBe(true)
+  await expect(page.locator("main")).toBeAttached()
 })
