@@ -6,6 +6,12 @@ import { defineConfig, loadEnv } from "vite"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "")
+  // Alive hands every service its neighbours' ports by name and the bind host in
+  // HOST (loopback on a person's computer). Unset HOST binds every interface: the
+  // preview edge dials this server over IPv4, and Vite's own default (`localhost`)
+  // can resolve to ::1 alone. The 3000/3001 defaults are for runs without Alive.
+  const host = env.HOST || true
+  const apiTarget = env.API_PROXY_TARGET ?? `http://localhost:${env.PORT_API || 3001}`
   return {
     plugins: [
       tanstackRouter({ target: "react", autoCodeSplitting: true }),
@@ -17,16 +23,16 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       port: Number(env.PORT ?? 3000),
-      host: true,
+      host,
       // Dev-only mirror of nginx.conf's `location /rpc/` so the same-origin
-      // "/rpc" client default reaches the api (bun, :3001) in dev too.
+      // "/rpc" client default reaches the api (bun) in dev too.
       proxy: {
-        "/rpc": env.API_PROXY_TARGET ?? "http://localhost:3001",
+        "/rpc": apiTarget,
       },
     },
     preview: {
       port: Number(env.PORT ?? 3000),
-      host: true,
+      host,
     },
   }
 })

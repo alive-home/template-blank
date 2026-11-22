@@ -24,6 +24,7 @@
     "lint": "biome check . && bun run lint:file-length",
     "lint:file-length": "scripts/check-file-length.sh",
     "lint:fix": "biome check --write .",
+    "test": "bun --filter './apps/*' test",
     "test:e2e": "bun --filter e2e test",
     "typecheck": "turbo run typecheck"
   },

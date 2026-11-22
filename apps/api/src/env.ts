@@ -5,6 +5,8 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     PORT: z.coerce.number().int().positive().default(3001),
+    // Bind host: Alive sets it (loopback on a person's computer); unset binds every interface.
+    HOST: z.string().optional(),
     API_BASE_URL: z.url(),
     WEB_BASE_URL: z.url(),
     AUTH_SECRET: z.string().min(16),

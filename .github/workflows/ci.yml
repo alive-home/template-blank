@@ -42,6 +42,15 @@ jobs:
       - uses: ./.github/actions/setup
       - run: bun run typecheck
 
+  test:
+    if: github.repository_owner != 'alive-team'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: bun run test
+
   build:
     if: github.repository_owner != 'alive-team'
     runs-on: ubuntu-latest
@@ -84,9 +93,14 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
-      # Playwright boots api + web itself (webServer in playwright.config.ts)
-      # with its own localhost defaults — no .env needed in CI.
+      # Playwright boots api + web itself (webServer in playwright.config.ts) and
+      # hands each its port the way Alive's supervisor does (PORT, PORT_API). The
+      # ports are not 3000 and 3001, so nothing in the dev setup may depend on
+      # those — no .env needed in CI.
       - run: bun run test:e2e
+        env:
+          WEB_BASE_URL: http://localhost:4100
+          API_BASE_URL: http://localhost:4101
 
       - name: Upload Playwright report
         if: failure()
@@ -138,7 +152,7 @@ jobs:
     # The single required check. `if: always()` so it still reports when a
     # dependency fails — otherwise a skipped aggregator counts as "passing"
     # under branch protection's "required checks that didn't run" semantics.
-    needs: [lint, typecheck, build, e2e, docker, workflow-lint]
+    needs: [lint, typecheck, test, build, e2e, docker, workflow-lint]
     if: always() && github.repository_owner != 'alive-team'
     runs-on: ubuntu-latest
     timeout-minutes: 5
