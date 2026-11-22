@@ -34,3 +34,7 @@ test("listens on the host Alive gives in HOST and the port in PORT", () => {
 test("listens on every interface when HOST is unset", () => {
   expect(exportedServer({ PORT: "4101" })).toEqual({ port: 4101 })
 })
+
+test("an empty HOST counts as unset", () => {
+  expect(exportedServer({ PORT: "4101", HOST: "" })).toEqual({ port: 4101 })
+})

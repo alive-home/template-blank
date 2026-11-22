@@ -114,6 +114,8 @@ Web uses Node subpath imports (`#/...`) wired in [`apps/web/package.json`](apps/
 | `VITE_WEB_BASE_URL`  | client     | web (build-time)    |
 | `AUTH_SECRET`        | server     | api (login + JWT)   |
 | `PORT`               | server     | api (default 3001)  |
+| `PORT_API`           | server     | web dev server: the api's port for the `/rpc` proxy (unset or empty: 3001) |
+| `HOST`               | server     | api, web dev server: bind host (unset or empty: every interface) |
 
 `VITE_*` values are inlined at *build* time, not runtime — they have to be present when `vite build` runs, which means they're also build args in `docker-bake.hcl`'s `web` target.
 

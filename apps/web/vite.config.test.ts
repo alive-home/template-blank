@@ -33,6 +33,13 @@ test("binds the host Alive gives in HOST", () => {
   expect(preview?.host).toBe("127.0.0.1")
 })
 
+test("an empty HOST or PORT_API counts as unset", () => {
+  const { server, preview } = resolve({ HOST: "", PORT_API: "" })
+  expect(server?.host).toBe(true)
+  expect(preview?.host).toBe(true)
+  expect(server?.proxy).toEqual({ "/rpc": "http://localhost:3001" })
+})
+
 test("proxies /rpc to the api port Alive gives in PORT_API", () => {
   expect(resolve({ PORT_API: "4101" }).server?.proxy).toEqual({ "/rpc": "http://localhost:4101" })
 })
