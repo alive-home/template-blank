@@ -31,6 +31,7 @@ app.use("/rpc/*", async (c, next) => {
 
 export default {
   port: env.PORT,
+  hostname: env.HOST,
   fetch: app.fetch,
 }
 

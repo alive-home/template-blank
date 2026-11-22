@@ -73,19 +73,26 @@ keep = [
 env_file = ".env"
 root_modules = "node_modules"
 
+# A `port` below is the service's number in an Alive sandbox only; another host
+# picks its own. Every service listens on $PORT, reads the other's port as
+# $PORT_<NAME> (PORT_API) and its browser origin as $ALIVE_PREVIEW_ORIGIN_<NAME>
+# (ALIVE_PREVIEW_ORIGIN_WEB), and binds the host in $HOST when there is one. Write
+# no port number or host name in a command.
+
 [dev.services.web]
 kind = "frontend"
 port = 3000
-# Vite; /rpc is proxied to the api service (see apps/web/vite.config.ts).
+# Vite; /rpc is proxied to the api service by name (see apps/web/vite.config.ts).
 # Deliberately no .env: its VITE_API_BASE_URL=http://localhost:3001 would make
 # the browser bypass the proxy; unset means same-origin "/rpc".
-command = "cd apps/web && bunx vite --port 3000 --strictPort"
+command = "cd apps/web && bunx vite --port \"$PORT\" --strictPort"
 needs = ["api"]
 
 [dev.services.api]
 kind = "backend"
 port = 3001
 health_path = "/health"
-# .env.development holds the env keys set in Alive's settings; it is read after
-# .env so those win. Bun skips a missing file.
-command = "cd apps/api && WEB_BASE_URL=https://3000-$ALIVE_PREVIEW_HOST_SUFFIX API_BASE_URL=https://3000-$ALIVE_PREVIEW_HOST_SUFFIX bun --env-file=../../.env --env-file=../../.env.development --hot run src/index.ts"
+# The browser reaches the api through web's /rpc proxy, so both base URLs are the
+# web origin. .env.development holds the env keys set in Alive's settings; it is
+# read after .env so those win. Bun skips a missing file.
+command = "cd apps/api && WEB_BASE_URL=$ALIVE_PREVIEW_ORIGIN_WEB API_BASE_URL=$ALIVE_PREVIEW_ORIGIN_WEB bun --env-file=../../.env --env-file=../../.env.development --hot run src/index.ts"

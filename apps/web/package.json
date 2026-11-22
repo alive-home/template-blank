@@ -35,6 +35,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview --port 3000 --host",
+    "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "type": "module"
